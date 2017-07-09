@@ -1,6 +1,8 @@
 #importing libraries
 import requests
 import urllib
+from textblob import TextBlob
+from textblob.sentiments import NaiveBayesAnalyzer
 
 #acessing app token and store it in a variable
 my_token = '4408952527.60abb0c.8a35373099984d50aa35a93d64317764'
@@ -164,6 +166,8 @@ def like_post(insta_username):
     else:
         print 'your like was unsuccessful. try again!'
 
+
+
 #defining function to post a comment on the recent post of the user
 def post_a_comment(insta_username):
     # call the function get_post_id to get the id of the post in which we need to make a comment
@@ -182,6 +186,50 @@ def post_a_comment(insta_username):
     else:
         print 'unable to add the comment. Try Again!'
 
+#declaring the function to delete the negative comments from the users post
+
+def del_neg_comments(inst_username):
+    media_id = get_post_id(inst_username)
+    request_url = (base_url + 'media/%s/comments/?access_token=%s') % (media_id, my_token)
+    print 'GET request url: %s' %(request_url)
+    comment_info = requests.get(request_url).json()
+
+    # check the status code, if comes 200 then proceed
+    if comment_info['meta']['code']== 200:
+        if len(comment_info['data']):
+
+            # the naive implementation tells us how to delete the negative comment
+            for x in range(0,len(comment_info['data'])):
+                comment_id = comment_info['data'][x]['id']
+                comment_text = comment_info['data'][x]['text']
+                # implementing sentiment analysis using TextBlob library
+                blob = TextBlob(comment_text, analyzer= NaiveBayesAnalyzer())
+
+                #check the intent of positivity and negativity in the comments through sentiments
+                #if the intent of the negative comment is greater then function will make a delete call to delete the comment
+                if(blob.sentiment.p_neg > blob.sentiment.p_pos):
+                    print 'NEGATIVE comment :%s' % (comment_text)
+                    #to delete the comment using the endpoints
+                    delete_url = (base_url + 'media/%s/comments/%s/?access_token=%s') % (media_id,comment_id,my_token)
+                    print 'DELETE request url :%s' % (delete_url)
+                    delete_info = requests.delete(delete_url).json()
+
+                    #check if the status code is 200 then, then show the success of deleting the comment
+                    if delete_info['meta']['code'] == 200:
+                        print 'successfully deleted the comment!'
+                    else:
+                        print 'unable to delete the comment!'
+
+                 #if the intent of comment is positive then print the comment
+                else:
+                    print 'positive comment :%s' % (comment_text)
+
+        else:
+            print 'there are no existing comments on the post'
+    else:
+        print 'status code other than 200'
+
+
 
  #options available -what you want to do with the access token
 def start_bot():
@@ -189,33 +237,38 @@ def start_bot():
          print '\n'
          print 'hello, welcome to instabot!'
          print 'your menu options are as follows:'
-         print "a.get your own details\n"
-         print "b.get details of a user by username\n"
-         print "c.get your own recent post\n"
-         print "d.get the recent post of the user by username\n"
-         print "e.like the recent post of the user\n"
-         print "f.make a comment on the recent post of the user\n"
+         print "1.get your own details\n"
+         print "2.get details of a user by username\n"
+         print "3.get your own recent post\n"
+         print "4.get the recent post of the user by username\n"
+         print "5.like the recent post of the user\n"
+         print "6.make a comment on the recent post of the user\n"
+         print "7.delete negative comment from the post\n"
+         print "8.getting the list of comments\n"
 
          print 'x.EXIT'
 
          choice = raw_input("enter your choice: ")
-         if choice == "a":
+         if choice == "1":
              self_info()
-         elif choice== "b":
-             insta_username = raw_input('enter the username of the user: ')
+         elif choice== "2":
+             insta_username = raw_input("enter the username: ")
              get_user_info(insta_username)
-         elif choice == "c":
+         elif choice == "3":
              get_own_post()
-         elif choice == "d":
-             insta_username = raw_input("enter the username of the user: ")
+         elif choice == "4":
+             insta_username = raw_input("enter the username : ")
              get_users_post(insta_username)
-         elif choice == "e":
-             insta_username = raw_input("enter the username of the user:")
+         elif choice == "5":
+             insta_username = raw_input("enter the username : ")
              like_post(insta_username)
-         elif choice == "f":
-             insta_username = raw_input("enter the username of the user:")
+         elif choice == "6":
+             insta_username = raw_input("enter the username : ")
              post_a_comment(insta_username)
-
+         elif choice == "7":
+             insta_username = raw_input("enter the username : ")
+             del_neg_comments(insta_username)
+        
 
          elif choice == "x":
              exit()
