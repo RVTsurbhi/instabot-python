@@ -166,12 +166,33 @@ def like_post(insta_username):
     else:
         print 'your like was unsuccessful. try again!'
 
+#declaring the function to get the list of comments on the post
+def get_comments_list(insta_username):
+    media_id = get_post_id(insta_username)
+    if media_id is None:
+        print "There is no media"
+    else:
+        request_url = base_url + "media/%s/comments/?access_token=%s" % (media_id, my_token)
+        print "Get request url:%s" % request_url
+        comment_list = requests.get(request_url).json()
 
+     #check the status code, if comes 200 then show the list of comments
+    if comment_list['meta']['code'] == 200:
+        if len(comment_list['data']):
+            print "The comments on the post :"
+            for x in range(len(comment_list['data'])):
+                comment_text= comment_list['data'][x]['text']
+                print "comment: %s" % (comment_text)
+
+        else:
+            print "No comments on this post"
+    else:
+        print "Status code other than 200"
 
 #defining function to post a comment on the recent post of the user
 def post_a_comment(insta_username):
     # call the function get_post_id to get the id of the post in which we need to make a comment
-    media_id =get_post_id(insta_username)
+    media_id = get_post_id(insta_username)
     #use the media-id to make a post request. payload will consists of the access token and the comment to be added
     comment_text = raw_input("your comment: ")
     payload = {"access_token": my_token,"text": comment_text}
@@ -268,7 +289,10 @@ def start_bot():
          elif choice == "7":
              insta_username = raw_input("enter the username : ")
              del_neg_comments(insta_username)
-        
+         elif choice == "8":
+             insta_username = raw_input("enter the username : ")
+             get_comments_list(insta_username)
+
 
          elif choice == "x":
              exit()
