@@ -150,6 +150,31 @@ def get_post_id(insta_username):
 
         exit()
 
+#declaring the function to get the list of likes on a post
+def get_likes_list(insta_username):
+    media_id = get_post_id(insta_username)
+    if media_id == None:
+        print 'invalid media id'
+        exit()
+     #taking the endpoints for get request
+    request_url = (base_url + 'media/%s/likes?access_token=%s') % (media_id, my_token)
+    print 'GET request url: %s' % (request_url)
+    likes_list = requests.get(request_url).json()
+
+     #check the status code, if comes 200 then show the people who likes the post
+    if likes_list['meta']['code'] == 200:
+        if len(likes_list['data']):
+            print 'people who likes this post'
+            for i in range(len(likes_list['data'])):
+                #post_likes = likes_list['data'][i]
+                print ('likes : ' + likes_list['data'][i]['username'])
+        else:
+            print 'no likes on the post'
+
+    else:
+        print 'status code other than 200'
+
+
 #defining function to like the post of the user
 #access token is sent in payload to make post request (to like the post)
 def like_post(insta_username):
@@ -161,10 +186,11 @@ def like_post(insta_username):
 
     #to check if like was successful by checking the status code
     if post_a_like['meta']['code'] == 200:
-        print 'the like was successful'
+        print 'you successfully like the post!'
 
     else:
         print 'your like was unsuccessful. try again!'
+
 
 #declaring the function to get the list of comments on the post
 def get_comments_list(insta_username):
@@ -266,6 +292,8 @@ def start_bot():
          print "6.make a comment on the recent post of the user\n"
          print "7.delete negative comment from the post\n"
          print "8.getting the list of comments\n"
+         print "9.get the list of likes\n"
+
 
          print 'x.EXIT'
 
@@ -292,6 +320,9 @@ def start_bot():
          elif choice == "8":
              insta_username = raw_input("enter the username : ")
              get_comments_list(insta_username)
+         elif choice == "9":
+             insta_username = raw_input("enter the username : ")
+             get_likes_list(insta_username)
 
 
          elif choice == "x":
