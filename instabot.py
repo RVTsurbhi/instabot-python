@@ -83,7 +83,7 @@ def get_user_info(insta_username):
          print 'status code other than 200 received'
 
 
-#define a function to check or own recent post
+#declare a function to check our own recent post
 def get_own_post():
     request_url = (base_url + 'users/self/media/recent/?access_token=%s') % (my_token)
     print 'GET request url: %s' % (request_url)
@@ -192,6 +192,26 @@ def like_post(insta_username):
         print 'your like was unsuccessful. try again!'
 
 
+#function declaration to get the recent media liked by the user.
+def recent_media():
+    #including the endpoints to get the url
+    basic_url = (base_url + 'users/self/media/liked?access_token=%s') % (my_token)
+    print 'GET request url: %s' % (basic_url)
+    liked_recent_media = requests.get(basic_url).json()
+
+    #check the status code, if comes 200 then show the list of recent post liked by us
+    if liked_recent_media['meta']['code'] == 200:
+        if len(liked_recent_media['data']):
+            for x in range(len(liked_recent_media['data'])):
+                print 'recent posts liked by you : %s ' % (liked_recent_media['data'][x]['id'])
+
+        else:
+            print 'recently you liked no posts'
+
+    else:
+        print 'status code other than 200'
+
+
 #declaring the function to get the list of comments on the post
 def get_comments_list(insta_username):
     media_id = get_post_id(insta_username)
@@ -293,7 +313,7 @@ def start_bot():
          print "7.delete negative comment from the post\n"
          print "8.getting the list of comments\n"
          print "9.get the list of likes\n"
-
+         print "10.get the recent media liked by user\n"
 
          print 'x.EXIT'
 
@@ -323,6 +343,9 @@ def start_bot():
          elif choice == "9":
              insta_username = raw_input("enter the username : ")
              get_likes_list(insta_username)
+         elif choice == "10":
+            recent_media()
+
 
 
          elif choice == "x":
