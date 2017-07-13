@@ -3,6 +3,7 @@ import requests
 import urllib
 from textblob import TextBlob
 from textblob.sentiments import NaiveBayesAnalyzer
+from termcolor import colored
 
 #acessing app token and store it in a variable
 my_token = '4408952527.60abb0c.8a35373099984d50aa35a93d64317764'
@@ -20,18 +21,18 @@ def self_info():
      # but first we have to check if the status code is 200 or not
     if user_info['meta']['code'] == 200:
         if len(user_info['data']):
-            print 'username: %s' %(user_info['data']['username'])
-            print 'no. of followers: %s' %(user_info['data']['counts']['followed_by'])
-            print 'no. of people you are following: %s' % (user_info['data']['counts']['follows'])
-            print 'no. of posts: %s' % (user_info['data']['counts']['media'])
-            print 'Bio: %s' % (user_info['data']['bio'])
-            print 'websites: %s' % (user_info['data']['website'])
+            print 'username: %s' % colored(user_info['data']['username'], 'red')
+            print 'no. of followers: %s' % colored(user_info['data']['counts']['followed_by'], 'red')
+            print 'no. of people you are following: %s' % colored(user_info['data']['counts']['follows'], 'red')
+            print 'no. of posts: %s' % colored(user_info['data']['counts']['media'], 'red')
+            print 'Bio: %s' % colored(user_info['data']['bio'], 'red')
+            print 'websites: %s' % colored(user_info['data']['website'], 'red')
 
         else:
-            print 'user does not exist'
+            print colored('user does not exist', 'blue')
 
     else:
-        print 'status code other than 200 received!'
+        print ('status code other than 200 received!')
 
 #create a function to get the ID of the user by username
 
@@ -51,7 +52,7 @@ def get_user_id(insta_username):
             return None
 
     else:
-        print 'status code other than 200 received'
+        print ('status code other than 200 received', )
         exit()
 
  #create a function to get the infornation about the user by taking instagram username as its input
@@ -61,8 +62,8 @@ def get_user_info(insta_username):
      if user_id == None:
          print 'user does not exist!'
          exit()
-     #user_info = requests.get((base_url + 'users/%s?&access_token=%s') % (user_id, my_token)).json()
 
+      #taking the endpoints in the url
      request_url = (base_url + 'users/%s?access_token=%s') % (user_id, my_token)
      print 'GET request url : %s' % (request_url)
      user_info = requests.get(request_url).json()
@@ -70,14 +71,15 @@ def get_user_info(insta_username):
      #from the received response we can fetch the data about the user like no. of followers, following and post
      if user_info['meta']['code']== 200:
          if len(user_info['data']):
-             print 'username: %s' % (user_info['data']['username'])
-             print 'fullname: %s' % (user_info['data']['full_name'])
-             print 'no. of followers: %s' % (user_info['data']['counts']['followed_by'])
-             print 'no. of people following: %s' % (user_info['data']['counts']['follows'])
-             print 'no. of posts: %s' % (user_info['data']['counts']['media'])
-             print 'BIO: %s' % (user_info['data']['bio'])
+             print 'username: %s' % colored(user_info['data']['username'], 'green')
+             print 'fullname: %s' % colored(user_info['data']['full_name'], 'green')
+             print 'no. of followers: %s' % colored(user_info['data']['counts']['followed_by'], 'green')
+             print 'no. of people following: %s' % colored(user_info['data']['counts']['follows'], 'green')
+             print 'no. of posts: %s' % colored(user_info['data']['counts']['media'], 'green')
+             print 'BIO: %s' % colored(user_info['data']['bio'], 'green')
+             print 'websites: %s' % colored(user_info['data']['website'], 'green')
          else:
-             print 'there is no data available for this user'
+             print colored('there is no data available for this user', 'blue')
 
      else:
          print 'status code other than 200 received'
@@ -95,9 +97,9 @@ def get_own_post():
             image_name = own_media['data'][0]['id'] + 'owner.jpg'
             image_url = own_media['data'][0]['images']['standard_resolution']['url']
             urllib.urlretrieve(image_url,image_name)
-            print 'image has been downloaded'
+            print colored('image has been downloaded', 'red')
         else:
-            print 'post does not exist'
+            print colored('post does not exist', 'blue')
 
     else:
         print 'status code other than 200 received'
@@ -121,9 +123,9 @@ def get_users_post(insta_username):
             image_name = user_media['data'][0]['id']+ 'pic.jpg'
             image_url = user_media['data'][0]['images']['standard_resolution']['url']
             urllib.urlretrieve(image_url,image_name)
-            print 'image has been downloaded'
+            print colored('image has been downloaded', 'blue')
         else:
-            print 'there is no recent post'
+            print colored('there is no recent post', 'red')
     else:
         print 'status code other than 200 received'
 
@@ -143,7 +145,7 @@ def get_post_id(insta_username):
         if len(user_media['data']):
             return user_media['data'][0]['id']
         else:
-            print 'ther is no recent post of the user'
+            print colored('there is no recent post of the user', 'green')
 
     else:
         print 'status code other than 200 received'
@@ -166,10 +168,9 @@ def get_likes_list(insta_username):
         if len(likes_list['data']):
             print 'people who likes this post'
             for i in range(len(likes_list['data'])):
-                #post_likes = likes_list['data'][i]
-                print ('likes : ' + likes_list['data'][i]['username'])
+                print colored('likes : ' + likes_list['data'][i]['username'], 'blue')
         else:
-            print 'no likes on the post'
+            print colored('no likes on the post', 'red')
 
     else:
         print 'status code other than 200'
@@ -186,10 +187,10 @@ def like_post(insta_username):
 
     #to check if like was successful by checking the status code
     if post_a_like['meta']['code'] == 200:
-        print 'you successfully like the post!'
+        print colored('you successfully like the post!', 'red')
 
     else:
-        print 'your like was unsuccessful. try again!'
+        print colored('your like was unsuccessful. try again!', 'blue')
 
 
 #function declaration to get the recent media liked by the user.
@@ -203,10 +204,10 @@ def recent_media():
     if liked_recent_media['meta']['code'] == 200:
         if len(liked_recent_media['data']):
             for x in range(len(liked_recent_media['data'])):
-                print 'recent posts liked by you : %s ' % (liked_recent_media['data'][x]['id'])
+                print 'recent posts liked by you : %s ' % colored(liked_recent_media['data'][x]['id'], 'red')
 
         else:
-            print 'recently you liked no posts'
+            print colored('recently you liked no posts', 'blue')
 
     else:
         print 'status code other than 200'
@@ -231,7 +232,7 @@ def get_comments_list(insta_username):
                 print "comment: %s" % (comment_text)
 
         else:
-            print "No comments on this post"
+            print colored("No comments on this post", 'red')
     else:
         print "Status code other than 200"
 
@@ -249,7 +250,7 @@ def post_a_comment(insta_username):
 
     #to check if comment was successful or not, while checking the status code
     if make_comment['meta']['code'] == 200:
-        print 'your new comment is added successfully!'
+        print colored('your new comment is added successfully!', 'blue')
     else:
         print 'unable to add the comment. Try Again!'
 
@@ -283,7 +284,7 @@ def del_neg_comments(inst_username):
 
                     #check if the status code is 200 then, then show the success of deleting the comment
                     if delete_info['meta']['code'] == 200:
-                        print 'successfully deleted the comment!'
+                        print colored('successfully deleted the comment!', 'green')
                     else:
                         print 'unable to delete the comment!'
 
@@ -292,9 +293,10 @@ def del_neg_comments(inst_username):
                     print 'positive comment :%s' % (comment_text)
 
         else:
-            print 'there are no existing comments on the post'
+            print colored('there are no existing comments on the post', 'blue')
     else:
         print 'status code other than 200'
+
 
 
 
@@ -302,18 +304,20 @@ def del_neg_comments(inst_username):
 def start_bot():
      while True:
          print '\n'
-         print 'hello, welcome to instabot!'
-         print 'your menu options are as follows:'
+         print colored('hello, welcome to instabot!', 'green')
+         print colored('your menu options are as follows:', 'green')
+
          print "1.get your own details\n"
          print "2.get details of a user by username\n"
          print "3.get your own recent post\n"
          print "4.get the recent post of the user by username\n"
-         print "5.like the recent post of the user\n"
-         print "6.make a comment on the recent post of the user\n"
-         print "7.delete negative comment from the post\n"
+         print "5.get the list of likes\n"
+         print "6.like the recent post of the user\n"
+         print "7.make a comment on the recent post of the user\n"
          print "8.getting the list of comments\n"
-         print "9.get the list of likes\n"
+         print "9.delete negative comment from the post\n"
          print "10.get the recent media liked by user\n"
+
 
          print 'x.EXIT'
 
@@ -330,23 +334,21 @@ def start_bot():
              get_users_post(insta_username)
          elif choice == "5":
              insta_username = raw_input("enter the username : ")
-             like_post(insta_username)
+             get_likes_list(insta_username)
          elif choice == "6":
              insta_username = raw_input("enter the username : ")
-             post_a_comment(insta_username)
+             like_post(insta_username)
          elif choice == "7":
              insta_username = raw_input("enter the username : ")
-             del_neg_comments(insta_username)
+             get_comments_list(insta_username)
          elif choice == "8":
              insta_username = raw_input("enter the username : ")
-             get_comments_list(insta_username)
+             post_a_comment(insta_username)
          elif choice == "9":
              insta_username = raw_input("enter the username : ")
-             get_likes_list(insta_username)
+             del_neg_comments(insta_username)
          elif choice == "10":
             recent_media()
-
-
 
          elif choice == "x":
              exit()
@@ -354,9 +356,15 @@ def start_bot():
          else:
             print 'invalid choice'
 
+#calling the main function
 start_bot()
 
-
+#users in the sanbox mode
+# 1. rvt_surbhi
+# 2. mudrasrivastava
+# 3. indian.bloke
+# 4. amitrawat5188
+# 5. dil_bole_aggarwals
 
 
 
